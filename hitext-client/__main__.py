@@ -7,6 +7,7 @@ from struct import pack
 from time import sleep, time
 from datetime import datetime
 #from hexdump import hexdump
+from pyfiglet import Figlet
 
 class Color:
     Red = 1
@@ -68,17 +69,23 @@ def main():
     # Step 0. Parse arguments
     parser = ArgumentParser()
     parser.add_argument('addr', help="Network addres i.e. 192.168.1.1")
+    parser.add_argument('--font', default='3-d', help="Font name")
     args = parser.parse_args()
     # Step 1. Create session
     c = Client(args.addr, broadcast=True)
+    f = Figlet(font=args.font)
     while True:
+        # Step 1. Make message
+        now = datetime.now()
+        stamp = now.strftime("%H:%M:%S")
+        lines = f.renderText(stamp)
         # Step 2. Make message builder
         mb = MessageBuilder()
         mb.write(Encoder.make_reset_msg())
-        mb.write(Encoder.make_gotoxy_msg(10, 10))
-        mb.write(Encoder.make_setcolor_msg(250, 0, 0))
-        now = datetime.now()
-        mb.writes(Encoder.make_write_msgs(f"Time {now}"))
+        mb.write(Encoder.make_setcolor_msg(128, 0, 0))
+        for num, line in enumerate(lines.split('\n')):
+            mb.write(Encoder.make_gotoxy_msg(18, 12 + num))
+            mb.writes(Encoder.make_write_msgs(line))
         # Step 3. Make message packet and TX packet
         msgs = mb.build()
         c.send(msgs)

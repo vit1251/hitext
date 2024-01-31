@@ -1,4 +1,5 @@
 
 depends = [
     "hexdump >= 3.3",
+    "pyfiglet",
 ]
