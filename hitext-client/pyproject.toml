@@ -1,0 +1,4 @@
+
+depends = [
+    "hexdump >= 3.3",
+]
